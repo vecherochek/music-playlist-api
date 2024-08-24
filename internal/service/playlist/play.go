@@ -1,7 +1,6 @@
 package playlist
 
 import (
-	"errors"
 	"log"
 	"time"
 
@@ -9,17 +8,18 @@ import (
 )
 
 func (s *service) Play() error {
-	if s.playlist == nil {
+	if s.playlist.Songs.Len() == 0 {
 		log.Println("playlist is empty")
-		return errors.New("playlist is empty")
+		return model.ErrorPlaylistIsEmpty
 	}
 
 	if s.playlist.Playing {
 		log.Println("playing already")
-		return errors.New("playing already")
+		return model.ErrorAlreadyPlaying
 	}
 
-	song := s.playlist.CurrentSong.Value.(*model.Song)
+	s.playlist.Playing = true
+	song, _ := s.playlist.GetCurrentSong()
 
 	go s.playSong(song)
 
@@ -27,10 +27,11 @@ func (s *service) Play() error {
 }
 
 func (s *service) playSong(song *model.Song) {
-	s.playlist.Playing = true
-	log.Printf("satrt playing song: %s\n", song.Title)
+	songInfo := song.SongInfo
 
-	for i := s.playlist.PausedAt; i < song.Duration.Seconds(); i++ {
+	log.Printf("satrt playing song: %s\n", songInfo.Title)
+
+	for i := s.playlist.PausedAt; i < songInfo.Duration.Seconds(); i++ {
 		select {
 		case <-s.playlist.PauseChan:
 			s.playlist.PausedAt = i
@@ -38,14 +39,15 @@ func (s *service) playSong(song *model.Song) {
 		case <-time.After(time.Second):
 			log.Printf(
 				"playing %s: %f/%f seconds\n",
-				song.Title,
+				songInfo.Title,
 				i+1,
-				song.Duration.Seconds())
+				songInfo.Duration.Seconds())
 		}
 	}
 	s.playlist.Playing = false
 
-	log.Printf("end playing song: %s\n", song.Title)
+	log.Printf("end playing song: %s\n", songInfo.Title)
+	log.Printf("start next")
 
 	err := s.Next()
 	if err != nil {
