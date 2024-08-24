@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  playlist-service:
+    build: .
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    environment:
+      - GRPC_HOST=${GRPC_HOST}
+      - GRPC_PORT=${GRPC_PORT}
+    networks:
+      - playlist-network
+
+networks:
+  playlist-network:
+    driver: bridge
