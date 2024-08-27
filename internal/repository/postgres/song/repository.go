@@ -9,7 +9,6 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/vecherochek/music-playlist-api/internal/model"
 	def "github.com/vecherochek/music-playlist-api/internal/repository"
-	"github.com/vecherochek/music-playlist-api/internal/repository/postgres"
 	"github.com/vecherochek/music-playlist-api/internal/repository/postgres/song/contract/converter"
 	repoModel "github.com/vecherochek/music-playlist-api/internal/repository/postgres/song/contract/model"
 )
@@ -60,7 +59,7 @@ func (r *repository) Update(ctx context.Context, version time.Time, song *model.
 	err = row.Err()
 
 	if err != nil {
-		return model.NewError(postgres.ErrorUpdateSong, err)
+		return model.NewError(def.ErrorUpdateSong, err)
 	}
 
 	return nil
@@ -69,7 +68,7 @@ func (r *repository) Update(ctx context.Context, version time.Time, song *model.
 func (r *repository) Delete(ctx context.Context, songUUID string) error {
 	_, err := r.Get(ctx, songUUID)
 	if err != nil {
-		return model.NewError(postgres.ErrorGetSong, err)
+		return model.NewError(def.ErrorGetSong, err)
 	}
 
 	query, args := DeleteQuery(songUUID)
@@ -77,7 +76,7 @@ func (r *repository) Delete(ctx context.Context, songUUID string) error {
 
 	err = row.Err()
 	if err != nil {
-		return model.NewError(postgres.ErrorDeleteSong, err)
+		return model.NewError(def.ErrorDeleteSong, err)
 	}
 
 	return nil
@@ -96,7 +95,7 @@ func (r *repository) Create(ctx context.Context, song *model.Song) (UUID string,
 	err = row.Scan(&id)
 
 	if err != nil {
-		return "", model.NewError(postgres.ErrorCreateSong, err)
+		return "", model.NewError(def.ErrorCreateSong, err)
 	}
 
 	return id, nil
@@ -110,7 +109,7 @@ func (r *repository) Get(ctx context.Context, songUUID string) (*model.Song, err
 	err := row.Scan(&song.UUID, &song.SongInfo, &song.UpdatedAt, &song.CreatedAt)
 
 	if err != nil {
-		return nil, model.NewError(postgres.ErrorGetSong, err)
+		return nil, model.NewError(def.ErrorGetSong, err)
 	}
 
 	return converter.ToSongFromRepo(&song)

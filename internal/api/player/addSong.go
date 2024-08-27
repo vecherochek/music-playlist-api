@@ -7,7 +7,7 @@ import (
 )
 
 func (i *Implementation) AddSong(ctx context.Context, req *desc.AddSongRequest) (*desc.AddSongResponse, error) {
-	err := i.playerService.AddSong(ctx, req.PlaylistUuid, req.SongUuid)
+	err := i.playerService.AddSong(ctx, req.PlayerUuid, req.SongUuid)
 	if err != nil {
 		return &desc.AddSongResponse{
 			Error: err.Error(),

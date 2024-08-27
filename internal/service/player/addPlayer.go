@@ -25,5 +25,6 @@ func (s *service) AddPlayer(ctx context.Context, playlistUUID string) (playerUUI
 	if err != nil {
 		return "", err
 	}
+
 	return playerUUID, nil
 }

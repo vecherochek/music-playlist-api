@@ -6,15 +6,20 @@ import (
 	desc "github.com/vecherochek/music-playlist-api/pkg/player_v1"
 )
 
-func (i *Implementation) Next(ctx context.Context, req *desc.NextRequest) (*desc.NextResponse, error) {
-
-	err := i.playerService.Next(ctx, req.PlaylistUuid)
-
+func (i *Implementation) Next(req *desc.NextRequest, stream desc.PlayerV1_NextServer) error {
+	logs, err := i.playerService.Next(context.Background(), req.PlayerUuid)
 	if err != nil {
-		return &desc.NextResponse{
-			Error: err.Error(),
-		}, nil
+		if err := stream.Send(&desc.StreamNextResponse{Error: err.Error()}); err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return &desc.NextResponse{}, nil
+	for log := range logs {
+		if err := stream.Send(&desc.StreamNextResponse{Log: log}); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

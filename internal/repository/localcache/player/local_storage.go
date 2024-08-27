@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/vecherochek/music-playlist-api/internal/model"
 	def "github.com/vecherochek/music-playlist-api/internal/repository"
-	"github.com/vecherochek/music-playlist-api/internal/repository/postgres"
 )
 
 var _ def.PlayerLocalStorage = (*repository)(nil)
@@ -31,19 +30,12 @@ func (r repository) Create(_ context.Context, playlistUUID string, songs *list.L
 
 	playerUuid, err := uuid.NewUUID()
 	if err != nil {
-		return "", postgres.ErrorCantCreateUUID
+		return "", def.ErrorCantCreateUUID
 	}
 
-	player := model.Player{
-		PlayerUUID:   playerUuid.String(),
-		PlaylistUUID: playlistUUID,
-		Songs:        songs,
-		CurrentSong:  songs.Front(),
-		Playing:      false,
-		PauseChan:    make(chan struct{}),
-	}
+	player := model.NewPlayer(playerUuid.String(), playlistUUID, songs)
 
-	r.players[player.PlayerUUID] = &player
+	r.players[player.PlayerUUID] = player
 
 	return player.PlayerUUID, nil
 }
@@ -54,7 +46,7 @@ func (r repository) Get(_ context.Context, playerUUID string) (*model.Player, er
 
 	player, ok := r.players[playerUUID]
 	if !ok {
-		return nil, postgres.ErrorPlayerNotExists
+		return nil, def.ErrorPlayerNotExists
 	}
 
 	return player, nil

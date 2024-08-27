@@ -18,6 +18,12 @@ func (s *service) Pause(ctx context.Context, playlistUUID string) error {
 		return model.ErrorPlaylistIsEmpty
 	}
 
+	err = player.ReopenLogsChannel()
+	if err != nil {
+		return nil
+
+	}
+
 	if !player.Playing {
 		log.Println("paused already")
 		return model.ErrorAlreadyPaused

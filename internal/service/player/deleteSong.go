@@ -20,23 +20,30 @@ func (s *service) DeleteSong(ctx context.Context, playlistUUID string, songUUID 
 		return model.ErrorDeleteAlreadyPlaying
 	}
 
-	song, err := s.songRepository.Get(ctx, songUUID)
+	err = s.playlistRepository.DeleteSong(ctx, player.PlaylistUUID, songUUID)
 	if err != nil {
 		return err
 	}
 
-	player.Songs.PushBack(song)
-
-	err = s.playlistRepository.DeleteSong(ctx, player.PlaylistUUID, songUUID)
-	if err != nil {
-		return err
+	for element := player.Songs.Front(); element != nil; {
+		song, ok := element.Value.(*model.Song)
+		if ok && song.UUID == songUUID {
+			next := element.Next()
+			player.Songs.Remove(element)
+			element = next
+		}
 	}
 
 	if player.CurrentSong == nil {
 		player.CurrentSong = player.Songs.Front()
 	}
 
-	log.Printf("added song: %s\n", song.SongInfo.Title)
+	song, err := s.songRepository.Get(ctx, songUUID)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("deleted song: %s\n", song.SongInfo.Title)
 
 	return nil
 }

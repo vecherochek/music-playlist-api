@@ -5,10 +5,11 @@ import (
 )
 
 type Song struct {
-	UUID      string
-	SongInfo  SongInfo
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	UUID            string
+	SongInfo        SongInfo
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	SongLogsChannel chan string
 }
 
 type SongInfo struct {

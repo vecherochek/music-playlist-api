@@ -10,13 +10,13 @@ type PlayerService interface {
 	AddPlayer(ctx context.Context, playlistUUID string) (playerUUID string, err error)
 	DeletePlayer(ctx context.Context, playerUUID string) error
 
-	AddSong(ctx context.Context, playlistUUID string, songUUID string) error
-	DeleteSong(ctx context.Context, playlistUUID string, songUUID string) error
+	AddSong(ctx context.Context, playerUUID string, songUUID string) error
+	DeleteSong(ctx context.Context, playerUUID string, songUUID string) error
 
-	Play(ctx context.Context, playlistUUID string) error
-	Pause(ctx context.Context, playlistUUID string) error
-	Next(ctx context.Context, playlistUUID string) error
-	Prev(ctx context.Context, playlistUUID string) error
+	Play(ctx context.Context, playerUUID string) (chan string, error)
+	Pause(ctx context.Context, playerUUID string) error
+	Next(ctx context.Context, playerUUID string) (chan string, error)
+	Prev(ctx context.Context, playerUUID string) (chan string, error)
 }
 
 type PlaylistService interface {
