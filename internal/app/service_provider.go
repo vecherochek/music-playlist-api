@@ -22,8 +22,9 @@ type serviceProvider struct {
 	playlistService    service.PlaylistService
 	playlistImpl       *playlist.Implementation
 
-	playerService service.PlayerService
-	playerImpl    *player.Implementation
+	playerService      service.PlayerService
+	playerImpl         *player.Implementation
+	playerLocalStorage repository.PlayerLocalStorage
 }
 
 func newServiceProvider() *serviceProvider {

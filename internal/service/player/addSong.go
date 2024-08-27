@@ -9,7 +9,10 @@ func (s *service) AddSong(ctx context.Context, playlistUUID string, songUUID str
 	s.m.Lock()
 	defer s.m.Unlock()
 
-	player := s.players[playlistUUID]
+	player, err := s.playerLocalStorage.Get(ctx, playlistUUID)
+	if err != nil {
+		return err
+	}
 
 	song, err := s.songRepository.Get(ctx, songUUID)
 	if err != nil {

@@ -8,10 +8,13 @@ import (
 )
 
 func (s *service) Pause(ctx context.Context, playlistUUID string) error {
-	player := s.players[playlistUUID]
+	player, err := s.playerLocalStorage.Get(ctx, playlistUUID)
+	if err != nil {
+		return err
+	}
 
 	if player.Songs.Len() == 0 {
-		log.Println("playlist is empty")
+		log.Println("player is empty")
 		return model.ErrorPlaylistIsEmpty
 	}
 

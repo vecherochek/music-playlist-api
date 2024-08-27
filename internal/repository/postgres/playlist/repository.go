@@ -131,7 +131,7 @@ func (r *repository) DeleteSong(ctx context.Context, playlistUUID string, songUU
 	}
 
 	if len(songs) == len(playlist.PlaylistInfo.SongList) {
-		return errors.New("no such song in playlist")
+		return errors.New("no such song in player")
 	}
 
 	playlist.UpdateSongList(songs)

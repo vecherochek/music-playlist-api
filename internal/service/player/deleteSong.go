@@ -10,7 +10,10 @@ func (s *service) DeleteSong(ctx context.Context, playlistUUID string, songUUID 
 	s.m.Lock()
 	defer s.m.Unlock()
 
-	player := s.players[playlistUUID]
+	player, err := s.playerLocalStorage.Get(ctx, playlistUUID)
+	if err != nil {
+		return err
+	}
 
 	if player.Playing {
 		return errors.New("cannot delete song because is already playing")

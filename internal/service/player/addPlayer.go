@@ -4,9 +4,6 @@ import (
 	"container/list"
 	"context"
 	"errors"
-
-	"github.com/google/uuid"
-	"github.com/vecherochek/music-playlist-api/internal/model"
 )
 
 func (s *service) AddPlayer(ctx context.Context, playlistUUID string) (playerUUID string, err error) {
@@ -18,7 +15,6 @@ func (s *service) AddPlayer(ctx context.Context, playlistUUID string) (playerUUI
 		return "", errors.New("Playlist not found")
 	}
 
-	playerUuid, err := uuid.NewUUID()
 	var songs list.List
 
 	for _, songUUID := range playlist.PlaylistInfo.SongList {
@@ -26,16 +22,9 @@ func (s *service) AddPlayer(ctx context.Context, playlistUUID string) (playerUUI
 		songs.PushBack(song)
 	}
 
-	player := model.Player{
-		PlayerUUID:   playerUuid.String(),
-		PlaylistUUID: playlistUUID,
-		Songs:        &songs,
-		CurrentSong:  songs.Front(),
-		Playing:      false,
-		PauseChan:    make(chan struct{}),
+	playerUUID, err = s.playerLocalStorage.Create(ctx, playlistUUID, &songs)
+	if err != nil {
+		return "", err
 	}
-
-	s.players[player.PlayerUUID] = &player
-
-	return playerUuid.String(), nil
+	return playerUUID, nil
 }

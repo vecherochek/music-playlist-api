@@ -11,10 +11,13 @@ func (s *service) Prev(ctx context.Context, playlistUUID string) error {
 	s.m.Lock()
 	defer s.m.Unlock()
 
-	player := s.players[playlistUUID]
+	player, err := s.playerLocalStorage.Get(ctx, playlistUUID)
+	if err != nil {
+		return err
+	}
 
 	if player.Songs.Len() == 0 {
-		log.Println("playlist is empty")
+		log.Println("player is empty")
 		return model.ErrorPlaylistIsEmpty
 	}
 
@@ -33,7 +36,7 @@ func (s *service) Prev(ctx context.Context, playlistUUID string) error {
 	player.PrevSong()
 	log.Println("switched to the prev song")
 
-	err := s.Play(ctx, playlistUUID)
+	err = s.Play(ctx, playlistUUID)
 	if err != nil {
 		return err
 	}

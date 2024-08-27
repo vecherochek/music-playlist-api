@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"container/list"
 	"context"
 	"time"
 
@@ -22,4 +23,10 @@ type PlaylistRepository interface {
 
 	AddSong(ctx context.Context, playlistUUID string, songUUID string) error
 	DeleteSong(ctx context.Context, playlistUUID string, songUUID string) error
+}
+
+type PlayerLocalStorage interface {
+	Create(ctx context.Context, playlistUUID string, songs *list.List) (UUID string, err error)
+	Get(ctx context.Context, playerUUID string) (*model.Player, error)
+	Delete(ctx context.Context, playerUUID string) error
 }

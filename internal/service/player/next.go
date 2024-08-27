@@ -11,7 +11,17 @@ func (s *service) Next(ctx context.Context, playlistUUID string) error {
 	s.m.Lock()
 	defer s.m.Unlock()
 
-	player := s.players[playlistUUID]
+	player, err := s.playerLocalStorage.Get(ctx, playlistUUID)
+	if err != nil {
+		return err
+	}
+
+	if player.Playing {
+		err := s.Pause(ctx, playlistUUID)
+		if err != nil {
+			return err
+		}
+	}
 
 	if player.Songs.Len() == 0 {
 		log.Println("playlist is empty")
@@ -23,17 +33,10 @@ func (s *service) Next(ctx context.Context, playlistUUID string) error {
 		return model.ErrorNextSongNotFound
 	}
 
-	if player.Playing {
-		err := s.Pause(ctx, playlistUUID)
-		if err != nil {
-			return err
-		}
-	}
-
 	player.NextSong()
 	log.Println("switched to the next song")
 
-	err := s.Play(ctx, playlistUUID)
+	err = s.Play(ctx, playlistUUID)
 	if err != nil {
 		return err
 	}
