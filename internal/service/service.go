@@ -6,12 +6,24 @@ import (
 	"github.com/vecherochek/music-playlist-api/internal/model"
 )
 
+type PlayerService interface {
+	AddPlayer(ctx context.Context, playlistUUID string) (playerUUID string, err error)
+	DeletePlayer(ctx context.Context, playerUUID string) error
+
+	AddSong(ctx context.Context, playlistUUID string, songUUID string) error
+	DeleteSong(ctx context.Context, playlistUUID string, songUUID string) error
+
+	Play(ctx context.Context, playlistUUID string) error
+	Pause(ctx context.Context, playlistUUID string) error
+	Next(ctx context.Context, playlistUUID string) error
+	Prev(ctx context.Context, playlistUUID string) error
+}
+
 type PlaylistService interface {
-	AddSong(song *model.Song) error
-	Play() error
-	Pause() error
-	Next() error
-	Prev() error
+	Create(ctx context.Context, info *model.PlaylistInfo) (playlistUUID string, err error)
+	Get(ctx context.Context, playlistUUID string) (*model.Playlist, error)
+	Update(ctx context.Context, playlistUUID string, info *model.PlaylistInfo) error
+	Delete(ctx context.Context, playlistUUID string) error
 }
 
 type SongService interface {

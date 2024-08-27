@@ -1,36 +1,39 @@
-package playlist
+package player
 
 import (
+	"context"
 	"log"
 
 	"github.com/vecherochek/music-playlist-api/internal/model"
 )
 
-func (s *service) Prev() error {
+func (s *service) Prev(ctx context.Context, playlistUUID string) error {
 	s.m.Lock()
 	defer s.m.Unlock()
 
-	if s.playlist.Songs.Len() == 0 {
+	player := s.players[playlistUUID]
+
+	if player.Songs.Len() == 0 {
 		log.Println("playlist is empty")
 		return model.ErrorPlaylistIsEmpty
 	}
 
-	if s.playlist.CurrentSong.Prev() == nil {
+	if player.CurrentSong.Prev() == nil {
 		log.Println("at the beginning of the list: prev is null")
 		return model.ErrorPrevSongNotFound
 	}
 
-	if s.playlist.Playing {
-		err := s.Pause()
+	if player.Playing {
+		err := s.Pause(ctx, playlistUUID)
 		if err != nil {
 			return err
 		}
 	}
 
-	s.playlist.PrevSong()
+	player.PrevSong()
 	log.Println("switched to the prev song")
 
-	err := s.Play()
+	err := s.Play(ctx, playlistUUID)
 	if err != nil {
 		return err
 	}

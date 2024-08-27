@@ -1,47 +1,28 @@
 package model
 
 import (
-	"container/list"
-	"sync"
+	"time"
 )
 
 type Playlist struct {
-	Songs       *list.List
-	CurrentSong *list.Element
-	Playing     bool
-	PausedAt    float64
-	PauseChan   chan struct{}
-	m           sync.RWMutex
+	UUID         string
+	PlaylistInfo PlaylistInfo
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
-func NewPlaylist() *Playlist {
-	return &Playlist{
-		Songs:       list.New(),
-		CurrentSong: nil,
-		Playing:     false,
-		PauseChan:   make(chan struct{}),
-	}
+type PlaylistInfo struct {
+	Name     string
+	UserId   string
+	SongList []string
 }
 
-func (playlist *Playlist) NextSong() {
-	playlist.m.Lock()
-	defer playlist.m.Unlock()
-
-	playlist.CurrentSong = playlist.CurrentSong.Next()
-	playlist.PausedAt = 0
+func (playlist *Playlist) UpdatePlaylistInfo(info *PlaylistInfo) {
+	playlist.UpdatedAt = time.Now()
+	playlist.PlaylistInfo = *info
 }
 
-func (playlist *Playlist) PrevSong() {
-	playlist.m.Lock()
-	defer playlist.m.Unlock()
-
-	playlist.CurrentSong = playlist.CurrentSong.Prev()
-	playlist.PausedAt = 0
-}
-
-func (playlist *Playlist) GetCurrentSong() (*Song, error) {
-	playlist.m.RLock()
-	defer playlist.m.RUnlock()
-
-	return playlist.CurrentSong.Value.(*Song), nil
+func (playlist *Playlist) UpdateSongList(songIdArray []string) {
+	playlist.UpdatedAt = time.Now()
+	playlist.PlaylistInfo.SongList = songIdArray
 }

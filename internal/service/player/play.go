@@ -1,40 +1,44 @@
-package playlist
+package player
 
 import (
+	"context"
 	"log"
 	"time"
 
 	"github.com/vecherochek/music-playlist-api/internal/model"
 )
 
-func (s *service) Play() error {
-	if s.playlist.Songs.Len() == 0 {
+func (s *service) Play(ctx context.Context, playlistUUID string) error {
+
+	player := s.players[playlistUUID]
+
+	if player.Songs.Len() == 0 {
 		log.Println("playlist is empty")
 		return model.ErrorPlaylistIsEmpty
 	}
 
-	if s.playlist.Playing {
+	if player.Playing {
 		log.Println("playing already")
 		return model.ErrorAlreadyPlaying
 	}
 
-	s.playlist.Playing = true
-	song, _ := s.playlist.GetCurrentSong()
+	player.Playing = true
+	song, _ := player.GetCurrentSong()
 
-	go s.playSong(song)
+	go s.playSong(ctx, song, player)
 
 	return nil
 }
 
-func (s *service) playSong(song *model.Song) {
+func (s *service) playSong(ctx context.Context, song *model.Song, player *model.Player) {
 	songInfo := song.SongInfo
 
 	log.Printf("satrt playing song: %s\n", songInfo.Title)
 
-	for i := s.playlist.PausedAt; i < songInfo.Duration.Seconds(); i++ {
+	for i := player.PausedAt; i < songInfo.Duration.Seconds(); i++ {
 		select {
-		case <-s.playlist.PauseChan:
-			s.playlist.PausedAt = i
+		case <-player.PauseChan:
+			player.PausedAt = i
 			return
 		case <-time.After(time.Second):
 			log.Printf(
@@ -44,12 +48,12 @@ func (s *service) playSong(song *model.Song) {
 				songInfo.Duration.Seconds())
 		}
 	}
-	s.playlist.Playing = false
+	player.Playing = false
 
 	log.Printf("end playing song: %s\n", songInfo.Title)
 	log.Printf("start next")
 
-	err := s.Next()
+	err := s.Next(ctx, player.PlayerUUID)
 	if err != nil {
 		return
 	}

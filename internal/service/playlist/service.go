@@ -3,18 +3,18 @@ package playlist
 import (
 	"sync"
 
-	"github.com/vecherochek/music-playlist-api/internal/model"
+	"github.com/vecherochek/music-playlist-api/internal/repository"
 	def "github.com/vecherochek/music-playlist-api/internal/service"
 )
 
 var _ def.PlaylistService = (*service)(nil)
 
 type service struct {
-	playlist *model.Playlist
-	m        sync.RWMutex
+	playlistRepository repository.PlaylistRepository
+	m                  sync.RWMutex
 }
 
-func NewService() *service {
+func NewService(playlistRepository repository.PlaylistRepository) *service {
 	return &service{
-		playlist: model.NewPlaylist()}
+		playlistRepository: playlistRepository}
 }
