@@ -10,7 +10,9 @@ import (
 func (i *Implementation) Get(ctx context.Context, req *desc.GetSongRequest) (*desc.GetSongResponse, error) {
 	song, err := i.songService.Get(ctx, req.GetUuid())
 	if err != nil {
-		return nil, err
+		return &desc.GetSongResponse{
+			Error: err.Error(),
+		}, nil
 	}
 
 	return &desc.GetSongResponse{

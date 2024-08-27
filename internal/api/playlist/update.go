@@ -10,7 +10,9 @@ import (
 func (i *Implementation) Update(ctx context.Context, req *desc.UpdatePlaylistRequest) (*desc.UpdatePlaylistResponse, error) {
 	err := i.playlistService.Update(ctx, req.GetUuid(), converter.ToPlaylistInfoFromDesc(req.Info))
 	if err != nil {
-		return nil, err
+		return &desc.UpdatePlaylistResponse{
+			Error: err.Error(),
+		}, nil
 	}
 
 	return &desc.UpdatePlaylistResponse{}, nil

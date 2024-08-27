@@ -3,7 +3,6 @@ package player
 import (
 	"container/list"
 	"context"
-	"errors"
 )
 
 func (s *service) AddPlayer(ctx context.Context, playlistUUID string) (playerUUID string, err error) {
@@ -12,7 +11,7 @@ func (s *service) AddPlayer(ctx context.Context, playlistUUID string) (playerUUI
 
 	playlist, err := s.playlistRepository.Get(ctx, playlistUUID)
 	if err != nil {
-		return "", errors.New("Playlist not found")
+		return "", err
 	}
 
 	var songs list.List

@@ -2,8 +2,9 @@ package player
 
 import (
 	"context"
-	"errors"
 	"log"
+
+	"github.com/vecherochek/music-playlist-api/internal/model"
 )
 
 func (s *service) DeleteSong(ctx context.Context, playlistUUID string, songUUID string) error {
@@ -16,7 +17,7 @@ func (s *service) DeleteSong(ctx context.Context, playlistUUID string, songUUID 
 	}
 
 	if player.Playing {
-		return errors.New("cannot delete song because is already playing")
+		return model.ErrorDeleteAlreadyPlaying
 	}
 
 	song, err := s.songRepository.Get(ctx, songUUID)

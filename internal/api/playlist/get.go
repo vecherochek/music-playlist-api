@@ -10,7 +10,9 @@ import (
 func (i *Implementation) Get(ctx context.Context, req *desc.GetPlaylistRequest) (*desc.GetPlaylistResponse, error) {
 	playlist, err := i.playlistService.Get(ctx, req.GetUuid())
 	if err != nil {
-		return nil, err
+		return &desc.GetPlaylistResponse{
+			Error: err.Error(),
+		}, nil
 	}
 
 	return &desc.GetPlaylistResponse{
