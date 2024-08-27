@@ -9,3 +9,7 @@ var (
 	ErrorAlreadyPaused    = errors.New("nothing is being played")
 	ErrorAlreadyPlaying   = errors.New("the song is already playing")
 )
+
+func NewError(template error, err error) error {
+	return errors.New(template.Error() + err.Error())
+}

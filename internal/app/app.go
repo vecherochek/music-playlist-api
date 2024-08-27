@@ -49,6 +49,10 @@ func (a *App) initDeps(ctx context.Context) error {
 	return nil
 }
 
+func (a *App) initExporter() {
+
+}
+
 func (a *App) initConfig(_ context.Context) error {
 	err := config.Load(".env")
 	if err != nil {

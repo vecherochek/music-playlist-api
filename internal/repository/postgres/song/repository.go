@@ -9,9 +9,12 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/vecherochek/music-playlist-api/internal/model"
 	def "github.com/vecherochek/music-playlist-api/internal/repository"
+	"github.com/vecherochek/music-playlist-api/internal/repository/postgres"
 	"github.com/vecherochek/music-playlist-api/internal/repository/postgres/song/contract/converter"
 	repoModel "github.com/vecherochek/music-playlist-api/internal/repository/postgres/song/contract/model"
 )
+
+var ()
 
 var _ def.SongRepository = (*repository)(nil)
 
@@ -46,40 +49,54 @@ func (r *repository) Close() {
 }
 
 func (r *repository) Update(ctx context.Context, version time.Time, song *model.Song) error {
-	query, args := UpdateQuery(version, converter.ToSongFromService(song))
-	row := r.db.QueryRowContext(ctx, query, args...)
-
-	err := row.Err()
-
+	songRepo, err := converter.ToSongFromService(song)
 	if err != nil {
 		return err
+	}
+
+	query, args := UpdateQuery(version, songRepo)
+	row := r.db.QueryRowContext(ctx, query, args...)
+
+	err = row.Err()
+
+	if err != nil {
+		return model.NewError(postgres.ErrorUpdateSong, err)
 	}
 
 	return nil
 }
 
 func (r *repository) Delete(ctx context.Context, songUUID string) error {
+	_, err := r.Get(ctx, songUUID)
+	if err != nil {
+		return model.NewError(postgres.ErrorGetSong, err)
+	}
+
 	query, args := DeleteQuery(songUUID)
 	row := r.db.QueryRowContext(ctx, query, args...)
 
-	err := row.Err()
-
+	err = row.Err()
 	if err != nil {
-		return err
+		return model.NewError(postgres.ErrorDeleteSong, err)
 	}
 
 	return nil
 }
 
 func (r *repository) Create(ctx context.Context, song *model.Song) (UUID string, err error) {
-	query, args := CreateQuery(converter.ToSongFromService(song))
+	songRepo, err := converter.ToSongFromService(song)
+	if err != nil {
+		return "", err
+	}
+
+	query, args := CreateQuery(songRepo)
 	row := r.db.QueryRowContext(ctx, query, args...)
 
 	var id string
 	err = row.Scan(&id)
 
 	if err != nil {
-		return "", err
+		return "", model.NewError(postgres.ErrorCreateSong, err)
 	}
 
 	return id, nil
@@ -93,8 +110,8 @@ func (r *repository) Get(ctx context.Context, songUUID string) (*model.Song, err
 	err := row.Scan(&song.UUID, &song.SongInfo, &song.UpdatedAt, &song.CreatedAt)
 
 	if err != nil {
-		return nil, err
+		return nil, model.NewError(postgres.ErrorGetSong, err)
 	}
 
-	return converter.ToSongFromRepo(&song), nil
+	return converter.ToSongFromRepo(&song)
 }
