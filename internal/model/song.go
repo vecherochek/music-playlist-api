@@ -1,13 +1,22 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Song struct {
-	UUID     string
-	SongInfo SongInfo
+	UUID      string
+	SongInfo  SongInfo
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type SongInfo struct {
 	Title    string
 	Duration time.Duration
+}
+
+func (song *Song) UpdateSongInfo(info *SongInfo) {
+	song.UpdatedAt = time.Now()
+	song.SongInfo = *info
 }
