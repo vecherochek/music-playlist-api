@@ -26,10 +26,10 @@ type PlayerV1Client interface {
 	DeletePlayer(ctx context.Context, in *DeletePlayerRequest, opts ...grpc.CallOption) (*DeletePlayerResponse, error)
 	AddSong(ctx context.Context, in *AddSongRequest, opts ...grpc.CallOption) (*AddSongResponse, error)
 	DeleteSong(ctx context.Context, in *DeleteSongFromListRequest, opts ...grpc.CallOption) (*DeleteSongFromListResponse, error)
-	Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (*PlayResponse, error)
+	Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (PlayerV1_PlayClient, error)
 	Pause(ctx context.Context, in *PauseRequest, opts ...grpc.CallOption) (*PauseResponse, error)
-	Next(ctx context.Context, in *NextRequest, opts ...grpc.CallOption) (*NextResponse, error)
-	Prev(ctx context.Context, in *PrevRequest, opts ...grpc.CallOption) (*PrevResponse, error)
+	Next(ctx context.Context, in *NextRequest, opts ...grpc.CallOption) (PlayerV1_NextClient, error)
+	Prev(ctx context.Context, in *PrevRequest, opts ...grpc.CallOption) (PlayerV1_PrevClient, error)
 }
 
 type playerV1Client struct {
@@ -76,13 +76,36 @@ func (c *playerV1Client) DeleteSong(ctx context.Context, in *DeleteSongFromListR
 	return out, nil
 }
 
-func (c *playerV1Client) Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (*PlayResponse, error) {
-	out := new(PlayResponse)
-	err := c.cc.Invoke(ctx, "/music_player_v1.Player_v1/Play", in, out, opts...)
+func (c *playerV1Client) Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (PlayerV1_PlayClient, error) {
+	stream, err := c.cc.NewStream(ctx, &PlayerV1_ServiceDesc.Streams[0], "/music_player_v1.Player_v1/Play", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &playerV1PlayClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type PlayerV1_PlayClient interface {
+	Recv() (*StreamPlayResponse, error)
+	grpc.ClientStream
+}
+
+type playerV1PlayClient struct {
+	grpc.ClientStream
+}
+
+func (x *playerV1PlayClient) Recv() (*StreamPlayResponse, error) {
+	m := new(StreamPlayResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *playerV1Client) Pause(ctx context.Context, in *PauseRequest, opts ...grpc.CallOption) (*PauseResponse, error) {
@@ -94,22 +117,68 @@ func (c *playerV1Client) Pause(ctx context.Context, in *PauseRequest, opts ...gr
 	return out, nil
 }
 
-func (c *playerV1Client) Next(ctx context.Context, in *NextRequest, opts ...grpc.CallOption) (*NextResponse, error) {
-	out := new(NextResponse)
-	err := c.cc.Invoke(ctx, "/music_player_v1.Player_v1/Next", in, out, opts...)
+func (c *playerV1Client) Next(ctx context.Context, in *NextRequest, opts ...grpc.CallOption) (PlayerV1_NextClient, error) {
+	stream, err := c.cc.NewStream(ctx, &PlayerV1_ServiceDesc.Streams[1], "/music_player_v1.Player_v1/Next", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &playerV1NextClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
 
-func (c *playerV1Client) Prev(ctx context.Context, in *PrevRequest, opts ...grpc.CallOption) (*PrevResponse, error) {
-	out := new(PrevResponse)
-	err := c.cc.Invoke(ctx, "/music_player_v1.Player_v1/Prev", in, out, opts...)
+type PlayerV1_NextClient interface {
+	Recv() (*StreamNextResponse, error)
+	grpc.ClientStream
+}
+
+type playerV1NextClient struct {
+	grpc.ClientStream
+}
+
+func (x *playerV1NextClient) Recv() (*StreamNextResponse, error) {
+	m := new(StreamNextResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *playerV1Client) Prev(ctx context.Context, in *PrevRequest, opts ...grpc.CallOption) (PlayerV1_PrevClient, error) {
+	stream, err := c.cc.NewStream(ctx, &PlayerV1_ServiceDesc.Streams[2], "/music_player_v1.Player_v1/Prev", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &playerV1PrevClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type PlayerV1_PrevClient interface {
+	Recv() (*StreamPrevResponse, error)
+	grpc.ClientStream
+}
+
+type playerV1PrevClient struct {
+	grpc.ClientStream
+}
+
+func (x *playerV1PrevClient) Recv() (*StreamPrevResponse, error) {
+	m := new(StreamPrevResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // PlayerV1Server is the server API for PlayerV1 service.
@@ -120,10 +189,10 @@ type PlayerV1Server interface {
 	DeletePlayer(context.Context, *DeletePlayerRequest) (*DeletePlayerResponse, error)
 	AddSong(context.Context, *AddSongRequest) (*AddSongResponse, error)
 	DeleteSong(context.Context, *DeleteSongFromListRequest) (*DeleteSongFromListResponse, error)
-	Play(context.Context, *PlayRequest) (*PlayResponse, error)
+	Play(*PlayRequest, PlayerV1_PlayServer) error
 	Pause(context.Context, *PauseRequest) (*PauseResponse, error)
-	Next(context.Context, *NextRequest) (*NextResponse, error)
-	Prev(context.Context, *PrevRequest) (*PrevResponse, error)
+	Next(*NextRequest, PlayerV1_NextServer) error
+	Prev(*PrevRequest, PlayerV1_PrevServer) error
 	mustEmbedUnimplementedPlayerV1Server()
 }
 
@@ -143,17 +212,17 @@ func (UnimplementedPlayerV1Server) AddSong(context.Context, *AddSongRequest) (*A
 func (UnimplementedPlayerV1Server) DeleteSong(context.Context, *DeleteSongFromListRequest) (*DeleteSongFromListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSong not implemented")
 }
-func (UnimplementedPlayerV1Server) Play(context.Context, *PlayRequest) (*PlayResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Play not implemented")
+func (UnimplementedPlayerV1Server) Play(*PlayRequest, PlayerV1_PlayServer) error {
+	return status.Errorf(codes.Unimplemented, "method Play not implemented")
 }
 func (UnimplementedPlayerV1Server) Pause(context.Context, *PauseRequest) (*PauseResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Pause not implemented")
 }
-func (UnimplementedPlayerV1Server) Next(context.Context, *NextRequest) (*NextResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Next not implemented")
+func (UnimplementedPlayerV1Server) Next(*NextRequest, PlayerV1_NextServer) error {
+	return status.Errorf(codes.Unimplemented, "method Next not implemented")
 }
-func (UnimplementedPlayerV1Server) Prev(context.Context, *PrevRequest) (*PrevResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Prev not implemented")
+func (UnimplementedPlayerV1Server) Prev(*PrevRequest, PlayerV1_PrevServer) error {
+	return status.Errorf(codes.Unimplemented, "method Prev not implemented")
 }
 func (UnimplementedPlayerV1Server) mustEmbedUnimplementedPlayerV1Server() {}
 
@@ -240,22 +309,25 @@ func _PlayerV1_DeleteSong_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PlayerV1_Play_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PlayRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _PlayerV1_Play_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PlayRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(PlayerV1Server).Play(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/music_player_v1.Player_v1/Play",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerV1Server).Play(ctx, req.(*PlayRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(PlayerV1Server).Play(m, &playerV1PlayServer{stream})
+}
+
+type PlayerV1_PlayServer interface {
+	Send(*StreamPlayResponse) error
+	grpc.ServerStream
+}
+
+type playerV1PlayServer struct {
+	grpc.ServerStream
+}
+
+func (x *playerV1PlayServer) Send(m *StreamPlayResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _PlayerV1_Pause_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -276,40 +348,46 @@ func _PlayerV1_Pause_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PlayerV1_Next_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NextRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _PlayerV1_Next_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(NextRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(PlayerV1Server).Next(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/music_player_v1.Player_v1/Next",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerV1Server).Next(ctx, req.(*NextRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(PlayerV1Server).Next(m, &playerV1NextServer{stream})
 }
 
-func _PlayerV1_Prev_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PrevRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+type PlayerV1_NextServer interface {
+	Send(*StreamNextResponse) error
+	grpc.ServerStream
+}
+
+type playerV1NextServer struct {
+	grpc.ServerStream
+}
+
+func (x *playerV1NextServer) Send(m *StreamNextResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _PlayerV1_Prev_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PrevRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(PlayerV1Server).Prev(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/music_player_v1.Player_v1/Prev",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerV1Server).Prev(ctx, req.(*PrevRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(PlayerV1Server).Prev(m, &playerV1PrevServer{stream})
+}
+
+type PlayerV1_PrevServer interface {
+	Send(*StreamPrevResponse) error
+	grpc.ServerStream
+}
+
+type playerV1PrevServer struct {
+	grpc.ServerStream
+}
+
+func (x *playerV1PrevServer) Send(m *StreamPrevResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 // PlayerV1_ServiceDesc is the grpc.ServiceDesc for PlayerV1 service.
@@ -336,22 +414,26 @@ var PlayerV1_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PlayerV1_DeleteSong_Handler,
 		},
 		{
-			MethodName: "Play",
-			Handler:    _PlayerV1_Play_Handler,
-		},
-		{
 			MethodName: "Pause",
 			Handler:    _PlayerV1_Pause_Handler,
 		},
+	},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "Next",
-			Handler:    _PlayerV1_Next_Handler,
+			StreamName:    "Play",
+			Handler:       _PlayerV1_Play_Handler,
+			ServerStreams: true,
 		},
 		{
-			MethodName: "Prev",
-			Handler:    _PlayerV1_Prev_Handler,
+			StreamName:    "Next",
+			Handler:       _PlayerV1_Next_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "Prev",
+			Handler:       _PlayerV1_Prev_Handler,
+			ServerStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "player.proto",
 }

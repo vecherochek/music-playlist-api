@@ -11,10 +11,10 @@ service Player_v1 {
   rpc AddSong(AddSongRequest) returns (AddSongResponse);
   rpc DeleteSong(DeleteSongFromListRequest) returns (DeleteSongFromListResponse);
 
-  rpc Play(PlayRequest) returns (PlayResponse);
+  rpc Play(PlayRequest) returns (stream StreamPlayResponse){};
   rpc Pause(PauseRequest) returns (PauseResponse);
-  rpc Next(NextRequest) returns (NextResponse);
-  rpc Prev(PrevRequest) returns (PrevResponse);
+  rpc Next(NextRequest) returns (stream StreamNextResponse){};
+  rpc Prev(PrevRequest) returns (stream StreamPrevResponse){};
 }
 
 message AddPlayerRequest {
@@ -35,7 +35,7 @@ message DeletePlayerResponse {
 }
 
 message AddSongRequest {
-  string playlistUuid = 1;
+  string playerUuid = 1;
   string songUuid = 2;
 }
 
@@ -44,7 +44,7 @@ message AddSongResponse {
 }
 
 message DeleteSongFromListRequest {
-  string playlistUuid = 1;
+  string playerUuid = 1;
   string songUuid = 2;
 }
 
@@ -53,15 +53,16 @@ message DeleteSongFromListResponse {
 }
 
 message PlayRequest {
-  string playlistUuid = 1;
+  string playerUuid = 1;
 }
 
-message PlayResponse {
-  string error = 1;
+message StreamPlayResponse {
+  string log= 1;
+  string error = 2;
 }
 
 message PauseRequest {
-  string playlistUuid = 1;
+  string playerUuid = 1;
 }
 
 message PauseResponse {
@@ -69,17 +70,19 @@ message PauseResponse {
 }
 
 message NextRequest {
-  string playlistUuid = 1;
+  string playerUuid = 1;
 }
 
-message NextResponse {
-  string error = 1;
+message StreamNextResponse {
+  string log= 1;
+  string error = 2;
 }
 
 message PrevRequest {
-  string playlistUuid = 1;
+  string playerUuid = 1;
 }
 
-message PrevResponse {
-  string error = 1;
+message StreamPrevResponse {
+  string log= 1;
+  string error = 2;
 }

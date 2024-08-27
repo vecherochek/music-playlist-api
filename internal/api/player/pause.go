@@ -7,8 +7,7 @@ import (
 )
 
 func (i *Implementation) Pause(ctx context.Context, req *desc.PauseRequest) (*desc.PauseResponse, error) {
-
-	err := i.playerService.Pause(ctx, req.PlaylistUuid)
+	err := i.playerService.Pause(ctx, req.PlayerUuid)
 
 	if err != nil {
 		return &desc.PauseResponse{

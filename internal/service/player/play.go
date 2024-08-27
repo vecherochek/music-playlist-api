@@ -2,26 +2,27 @@ package player
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/vecherochek/music-playlist-api/internal/model"
 )
 
-func (s *service) Play(ctx context.Context, playlistUUID string) error {
+func (s *service) Play(ctx context.Context, playlistUUID string) (chan string, error) {
 	player, err := s.playerLocalStorage.Get(ctx, playlistUUID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if player.Songs.Len() == 0 {
 		log.Println("player is empty")
-		return model.ErrorPlaylistIsEmpty
+		return nil, model.ErrorPlaylistIsEmpty
 	}
 
 	if player.Playing {
 		log.Println("playing already")
-		return model.ErrorAlreadyPlaying
+		return nil, model.ErrorAlreadyPlaying
 	}
 
 	player.Playing = true
@@ -29,7 +30,7 @@ func (s *service) Play(ctx context.Context, playlistUUID string) error {
 
 	go s.playSong(ctx, song, player)
 
-	return nil
+	return player.SongLogsChan, nil
 }
 
 func (s *service) playSong(ctx context.Context, song *model.Song, player *model.Player) {
@@ -43,11 +44,13 @@ func (s *service) playSong(ctx context.Context, song *model.Song, player *model.
 			player.PausedAt = i
 			return
 		case <-time.After(time.Second):
-			log.Printf(
+			message := fmt.Sprintf(
 				"playing %s: %f/%f seconds\n",
 				songInfo.Title,
 				i+1,
 				songInfo.Duration.Seconds())
+			log.Printf(message)
+			player.SongLogsChan <- message
 		}
 	}
 	player.Playing = false
@@ -55,7 +58,7 @@ func (s *service) playSong(ctx context.Context, song *model.Song, player *model.
 	log.Printf("end playing song: %s\n", songInfo.Title)
 	log.Printf("start next")
 
-	err := s.Next(ctx, player.PlayerUUID)
+	_, err := s.Next(ctx, player.PlayerUUID)
 	if err != nil {
 		return
 	}
