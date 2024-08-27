@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package music_player_v1;
 
-option go_package = "github.com/vecherochek/music-playlist-api/pkg/player_v1;player_v1";
+option go_package = "github.com/vecherochek/music-player-api/pkg/player_v1;player_v1";
 
 message Playlist {
   string uuid = 1;
