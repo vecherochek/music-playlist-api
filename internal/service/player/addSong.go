@@ -6,13 +6,13 @@ import (
 )
 
 func (s *service) AddSong(ctx context.Context, playlistUUID string, songUUID string) error {
-	s.m.Lock()
-	defer s.m.Unlock()
-
 	player, err := s.playerLocalStorage.Get(ctx, playlistUUID)
 	if err != nil {
 		return err
 	}
+
+	player.M.Lock()
+	defer player.M.Unlock()
 
 	song, err := s.songRepository.Get(ctx, songUUID)
 	if err != nil {

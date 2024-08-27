@@ -8,13 +8,13 @@ import (
 )
 
 func (s *service) Prev(ctx context.Context, playlistUUID string) error {
-	s.m.Lock()
-	defer s.m.Unlock()
-
 	player, err := s.playerLocalStorage.Get(ctx, playlistUUID)
 	if err != nil {
 		return err
 	}
+
+	player.M.Lock()
+	defer player.M.Unlock()
 
 	if player.Songs.Len() == 0 {
 		log.Println("player is empty")

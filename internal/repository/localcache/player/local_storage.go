@@ -48,7 +48,7 @@ func (r repository) Create(_ context.Context, playlistUUID string, songs *list.L
 	return player.PlayerUUID, nil
 }
 
-func (r repository) Get(ctx context.Context, playerUUID string) (*model.Player, error) {
+func (r repository) Get(_ context.Context, playerUUID string) (*model.Player, error) {
 	r.m.RLock()
 	defer r.m.RUnlock()
 
