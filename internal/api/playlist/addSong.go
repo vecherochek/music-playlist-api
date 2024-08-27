@@ -10,7 +10,7 @@ import (
 
 func (i *Implementation) AddSong(ctx context.Context, req *desc.AddSongRequest) (*desc.AddSongResponse, error) {
 	i.playlistService.AddSong(&model.Song{
-		SongInfo: converter.ToSongInfoFromDesc(req.Info)})
+		SongInfo: *converter.ToSongInfoFromDesc(req.Info)})
 
 	return &desc.AddSongResponse{
 		Uuid: "11",

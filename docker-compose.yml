@@ -8,6 +8,21 @@ services:
     environment:
       - GRPC_HOST=${GRPC_HOST}
       - GRPC_PORT=${GRPC_PORT}
+    depends_on:
+      - playlist-service-postgres
+    networks:
+      - playlist-network
+
+  playlist-service-postgres:
+    image: postgres
+    container_name: playlist-service-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     networks:
       - playlist-network
 

@@ -23,4 +23,4 @@ generate-music-playlist-api:
 	--go-grpc_out=pkg/playlist_v1 \
 	--go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
-	api/playlist_v1/playlist.proto
+	api/playlist_v1/*.proto

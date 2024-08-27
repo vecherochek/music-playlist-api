@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package music_playlist_v1;
 
-import "google/protobuf/duration.proto";
+import "song.proto";
 
 option go_package = "github.com/vecherochek/music-playlist-api/pkg/playlist_v1;playlist_v1";
 
@@ -13,18 +13,6 @@ service Playlist_v1 {
   rpc Next(NextRequest) returns (NextResponse);
   rpc Prev(PrevRequest) returns (PrevResponse);
 }
-
-
-message Song {
-  string uuid = 1;
-  SongInfo song_info = 2;
-}
-
-message SongInfo {
-  string title = 1;
-  google.protobuf.Duration Duration = 2;
-}
-
 
 message AddSongRequest {
   SongInfo info = 1;

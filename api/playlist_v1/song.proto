@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package music_playlist_v1;
+
+option go_package = "github.com/vecherochek/music-playlist-api/pkg/playlist_v1;playlist_v1";
+
+import "google/protobuf/duration.proto";
+
+message Song {
+  string uuid = 1;
+  SongInfo song_info = 2;
+}
+
+message SongInfo {
+  string title = 1;
+  google.protobuf.Duration Duration = 2;
+}
+
+service Song_v1 {
+  rpc Create(CreateSongRequest) returns (CreateSongResponse);
+  rpc Get(GetSongRequest) returns (GetSongResponse);
+  rpc Update(UpdateSongRequest) returns (UpdateSongResponse);
+  rpc Delete(DeleteSongRequest) returns (DeleteSongResponse);
+}
+
+message CreateSongRequest {
+  SongInfo info = 1;
+}
+
+message CreateSongResponse {
+  string uuid = 1;
+}
+
+message GetSongRequest {
+  string uuid = 1;
+}
+
+message GetSongResponse {
+  Song song = 1;
+}
+
+message UpdateSongRequest {
+  string uuid = 1;
+  SongInfo info = 2;
+}
+
+message UpdateSongResponse {
+}
+
+message DeleteSongRequest {
+  string uuid = 1;
+}
+
+message DeleteSongResponse {
+}
