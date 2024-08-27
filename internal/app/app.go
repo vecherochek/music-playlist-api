@@ -68,6 +68,7 @@ func (a *App) initGRPCServer(_ context.Context) error {
 
 	reflection.Register(a.grpcServer)
 	desc.RegisterPlaylistV1Server(a.grpcServer, a.serviceProvider.PlaylistImpl())
+	desc.RegisterSongV1Server(a.grpcServer, a.serviceProvider.SongImpl())
 
 	return nil
 }
