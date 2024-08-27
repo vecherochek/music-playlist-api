@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/vecherochek/music-playlist-api/internal/model"
-	"github.com/vecherochek/music-playlist-api/internal/repository/postgres"
+	"github.com/vecherochek/music-playlist-api/internal/repository"
 	repoModel "github.com/vecherochek/music-playlist-api/internal/repository/postgres/song/contract/model"
 )
 
@@ -12,7 +12,7 @@ func ToSongFromRepo(song *repoModel.Song) (*model.Song, error) {
 	var songInfo model.SongInfo
 	err := json.Unmarshal(song.SongInfo, &songInfo)
 	if err != nil {
-		return nil, model.NewError(postgres.ErrorConvertSongFromRepo, err)
+		return nil, model.NewError(repository.ErrorConvertSongFromRepo, err)
 	}
 
 	return &model.Song{
@@ -26,7 +26,7 @@ func ToSongFromRepo(song *repoModel.Song) (*model.Song, error) {
 func ToSongFromService(song *model.Song) (*repoModel.Song, error) {
 	bytes, err := json.Marshal(song.SongInfo)
 	if err != nil {
-		return nil, model.NewError(postgres.ErrorConvertSongToRepo, err)
+		return nil, model.NewError(repository.ErrorConvertSongToRepo, err)
 	}
 
 	return &repoModel.Song{

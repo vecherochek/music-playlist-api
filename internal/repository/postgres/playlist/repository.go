@@ -9,7 +9,6 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/vecherochek/music-playlist-api/internal/model"
 	def "github.com/vecherochek/music-playlist-api/internal/repository"
-	"github.com/vecherochek/music-playlist-api/internal/repository/postgres"
 	"github.com/vecherochek/music-playlist-api/internal/repository/postgres/playlist/contract/converter"
 	repoModel "github.com/vecherochek/music-playlist-api/internal/repository/postgres/playlist/contract/model"
 )
@@ -57,7 +56,7 @@ func (r *repository) Update(ctx context.Context, version time.Time, playlist *mo
 
 	err = row.Err()
 	if err != nil {
-		return model.NewError(postgres.ErrorUpdatePlaylist, err)
+		return model.NewError(def.ErrorUpdatePlaylist, err)
 	}
 
 	return nil
@@ -70,7 +69,7 @@ func (r *repository) Delete(ctx context.Context, playlistUUID string) error {
 	err := row.Err()
 
 	if err != nil {
-		return model.NewError(postgres.ErrorDeletePlaylist, err)
+		return model.NewError(def.ErrorDeletePlaylist, err)
 	}
 
 	return nil
@@ -89,7 +88,7 @@ func (r *repository) Create(ctx context.Context, playlist *model.Playlist) (UUID
 	err = row.Scan(&id)
 
 	if err != nil {
-		return "", model.NewError(postgres.ErrorCreatePlaylist, err)
+		return "", model.NewError(def.ErrorCreatePlaylist, err)
 	}
 
 	return id, nil
@@ -103,7 +102,7 @@ func (r *repository) Get(ctx context.Context, playlistUUID string) (*model.Playl
 	err := row.Scan(&playlist.UUID, &playlist.PlaylistInfo, &playlist.UpdatedAt, &playlist.CreatedAt)
 
 	if err != nil {
-		return nil, model.NewError(postgres.ErrorGetPlaylist, err)
+		return nil, model.NewError(def.ErrorGetPlaylist, err)
 	}
 
 	return converter.ToPlaylistFromRepo(&playlist)
@@ -120,7 +119,7 @@ func (r *repository) AddSong(ctx context.Context, playlistUUID string, songUUID 
 
 	err = r.Update(ctx, version, playlist)
 	if err != nil {
-		return model.NewError(postgres.ErrorAddSongToPlaylist, err)
+		return model.NewError(def.ErrorAddSongToPlaylist, err)
 	}
 
 	return nil
@@ -140,15 +139,15 @@ func (r *repository) DeleteSong(ctx context.Context, playlistUUID string, songUU
 	}
 
 	if len(songs) == len(playlist.PlaylistInfo.SongList) {
-		return postgres.ErrorFindSongInPlaylist
+		return def.ErrorFindSongInPlaylist
 	}
 
-	playlist.UpdateSongList(songs)
 	version := playlist.UpdatedAt
+	playlist.UpdateSongList(songs)
 
 	err = r.Update(ctx, version, playlist)
 	if err != nil {
-		return model.NewError(postgres.ErrorDeleteSongFromPlaylist, err)
+		return model.NewError(def.ErrorDeleteSongFromPlaylist, err)
 	}
 
 	return nil

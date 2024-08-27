@@ -1,6 +1,6 @@
 -- +goose Up
 
-create table songs
+create table if not exists songs
 (
     id         uuid default gen_random_uuid() primary key,
     songInfo   jsonb null,
@@ -8,7 +8,7 @@ create table songs
     created_at timestamp without time zone default now() not null
 );
 
-create unique index songs_id_index
+create unique index if not exists songs_id_index
     on songs (id);
 
 -- +goose Down
