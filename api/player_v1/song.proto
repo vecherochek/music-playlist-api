@@ -29,6 +29,7 @@ message CreateSongRequest {
 
 message CreateSongResponse {
   string uuid = 1;
+  string error = 2;
 }
 
 message GetSongRequest {
@@ -37,6 +38,7 @@ message GetSongRequest {
 
 message GetSongResponse {
   Song song = 1;
+  string error = 2;
 }
 
 message UpdateSongRequest {
@@ -45,6 +47,7 @@ message UpdateSongRequest {
 }
 
 message UpdateSongResponse {
+  string error = 1;
 }
 
 message DeleteSongRequest {
@@ -52,4 +55,5 @@ message DeleteSongRequest {
 }
 
 message DeleteSongResponse {
+  string error = 1;
 }

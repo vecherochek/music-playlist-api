@@ -10,7 +10,9 @@ import (
 func (i *Implementation) Update(ctx context.Context, req *desc.UpdateSongRequest) (*desc.UpdateSongResponse, error) {
 	err := i.songService.Update(ctx, req.GetUuid(), converter.ToSongInfoFromDesc(req.Info))
 	if err != nil {
-		return nil, err
+		return &desc.UpdateSongResponse{
+			Error: err.Error(),
+		}, nil
 	}
 
 	return &desc.UpdateSongResponse{}, nil
