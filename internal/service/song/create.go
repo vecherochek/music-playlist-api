@@ -7,7 +7,7 @@ import (
 	"github.com/vecherochek/music-playlist-api/internal/model"
 )
 
-func (s *service) Create(ctx context.Context, info *model.SongInfo) (UUID string, err error) {
+func (s *service) Create(ctx context.Context, info *model.SongInfo) (playlistUUID string, err error) {
 	song := &model.Song{
 		SongInfo:  *info,
 		CreatedAt: time.Now(),

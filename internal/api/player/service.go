@@ -1,4 +1,4 @@
-package song
+package player
 
 import (
 	"github.com/vecherochek/music-playlist-api/internal/service"
@@ -6,12 +6,12 @@ import (
 )
 
 type Implementation struct {
-	desc.UnimplementedSongV1Server
-	songService service.SongService
+	desc.UnimplementedPlayerV1Server
+	playerService service.PlayerService
 }
 
-func NewImplementation(songService service.SongService) *Implementation {
+func NewImplementation(playerService service.PlayerService) *Implementation {
 	return &Implementation{
-		songService: songService,
+		playerService: playerService,
 	}
 }

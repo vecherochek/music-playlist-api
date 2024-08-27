@@ -1,14 +1,14 @@
-package playlist
+package player
 
 import (
 	"context"
 
-	desc "github.com/vecherochek/music-playlist-api/pkg/playlist_v1"
+	desc "github.com/vecherochek/music-playlist-api/pkg/player_v1"
 )
 
 func (i *Implementation) Pause(ctx context.Context, req *desc.PauseRequest) (*desc.PauseResponse, error) {
 
-	err := i.playlistService.Pause()
+	err := i.playerService.Pause(ctx, req.PlaylistUuid)
 
 	if err != nil {
 		return &desc.PauseResponse{

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package music_playlist_v1;
+package music_player_v1;
 
-option go_package = "github.com/vecherochek/music-playlist-api/pkg/playlist_v1;playlist_v1";
+option go_package = "github.com/vecherochek/music-player-api/pkg/player_v1;player_v1";
 
 import "google/protobuf/duration.proto";
 

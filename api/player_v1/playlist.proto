@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package music_player_v1;
+
+option go_package = "github.com/vecherochek/music-player-api/pkg/player_v1;player_v1";
+
+message Playlist {
+  string uuid = 1;
+  PlaylistInfo playlist_info = 2;
+}
+
+message PlaylistInfo {
+  string name = 1;
+  string userId = 2;
+  repeated string songList = 3;
+}
+
+service Playlist_v1 {
+  rpc Create(CreatePlaylistRequest) returns (CreatePlaylistResponse);
+  rpc Get(GetPlaylistRequest) returns (GetPlaylistResponse);
+  rpc Update(UpdatePlaylistRequest) returns (UpdatePlaylistResponse);
+  rpc Delete(DeletePlaylistRequest) returns (DeletePlaylistResponse);
+}
+
+message CreatePlaylistRequest {
+  PlaylistInfo info = 1;
+}
+
+message CreatePlaylistResponse {
+  string uuid = 1;
+  string error = 2;
+}
+
+message GetPlaylistRequest {
+  string uuid = 1;
+}
+
+message GetPlaylistResponse {
+  Playlist playlist = 1;
+  string error = 2;
+}
+
+message UpdatePlaylistRequest {
+  string uuid = 1;
+  PlaylistInfo info = 2;
+}
+
+message UpdatePlaylistResponse {
+  string error = 1;
+}
+
+message DeletePlaylistRequest {
+  string uuid = 1;
+}
+
+message DeletePlaylistResponse {
+  string error = 1;
+}
