@@ -6,7 +6,7 @@ import (
 	"net"
 
 	"github.com/vecherochek/music-playlist-api/internal/config"
-	desc "github.com/vecherochek/music-playlist-api/pkg/playlist_v1"
+	desc "github.com/vecherochek/music-playlist-api/pkg/player_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -67,6 +67,7 @@ func (a *App) initGRPCServer(_ context.Context) error {
 	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
 
 	reflection.Register(a.grpcServer)
+	desc.RegisterPlayerV1Server(a.grpcServer, a.serviceProvider.PlayerImpl())
 	desc.RegisterPlaylistV1Server(a.grpcServer, a.serviceProvider.PlaylistImpl())
 	desc.RegisterSongV1Server(a.grpcServer, a.serviceProvider.SongImpl())
 

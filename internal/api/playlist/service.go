@@ -2,7 +2,7 @@ package playlist
 
 import (
 	"github.com/vecherochek/music-playlist-api/internal/service"
-	desc "github.com/vecherochek/music-playlist-api/pkg/playlist_v1"
+	desc "github.com/vecherochek/music-playlist-api/pkg/player_v1"
 )
 
 type Implementation struct {
