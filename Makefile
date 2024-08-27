@@ -11,16 +11,16 @@ get-deps:
 
 
 generate:
-	make generate-music-playlist-api
+	make generate-music-player-api
 
-generate-music-playlist-api:
-	mkdir -p pkg/playlist_v1
-	protoc --proto_path api/playlist_v1 \
+generate-music-player-api:
+	mkdir -p pkg/player_v1
+	protoc --proto_path api/player_v1 \
 	--proto_path=/usr/include \
-	--go_out=pkg/playlist_v1 \
+	--go_out=pkg/player_v1 \
 	--go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
-	--go-grpc_out=pkg/playlist_v1 \
+	--go-grpc_out=pkg/player_v1 \
 	--go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
-	api/playlist_v1/*.proto
+	api/player_v1/*.proto

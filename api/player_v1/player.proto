@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package music_player_v1;
+
+option go_package = "github.com/vecherochek/music-playlist-api/pkg/player_v1;player_v1";
+
+service Player_v1 {
+  rpc AddPlayer(AddPlayerRequest) returns (AddPlayerResponse);
+  rpc DeletePlayer(DeletePlayerRequest) returns (DeletePlayerResponse);
+
+  rpc AddSong(AddSongRequest) returns (AddSongResponse);
+  rpc DeleteSong(DeleteSongFromListRequest) returns (DeleteSongFromListResponse);
+
+  rpc Play(PlayRequest) returns (PlayResponse);
+  rpc Pause(PauseRequest) returns (PauseResponse);
+  rpc Next(NextRequest) returns (NextResponse);
+  rpc Prev(PrevRequest) returns (PrevResponse);
+}
+
+message AddPlayerRequest {
+  string playlistUuid = 1;
+}
+
+message AddPlayerResponse {
+  string playerUuid = 1;
+  string error = 2;
+}
+
+message DeletePlayerRequest {
+  string playerUuid = 1;
+}
+
+message DeletePlayerResponse {
+  string error = 1;
+}
+
+message AddSongRequest {
+  string playlistUuid = 1;
+  string songUuid = 2;
+}
+
+message AddSongResponse {
+  string error = 1;
+}
+
+message DeleteSongFromListRequest {
+  string playlistUuid = 1;
+  string songUuid = 2;
+}
+
+message DeleteSongFromListResponse {
+  string error = 1;
+}
+
+message PlayRequest {
+  string playlistUuid = 1;
+}
+
+message PlayResponse {
+  string error = 1;
+}
+
+message PauseRequest {
+  string playlistUuid = 1;
+}
+
+message PauseResponse {
+  string error = 1;
+}
+
+message NextRequest {
+  string playlistUuid = 1;
+}
+
+message NextResponse {
+  string error = 1;
+}
+
+message PrevRequest {
+  string playlistUuid = 1;
+}
+
+message PrevResponse {
+  string error = 1;
+}
