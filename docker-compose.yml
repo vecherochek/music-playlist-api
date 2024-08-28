@@ -21,3 +21,19 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+
+  playlist-service-prometheus:
+    image: prom/prometheus
+    container_name: playlist-service-prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  playlist-service-grafana:
+    image: grafana/grafana
+    container_name: playlist-service-grafana
+    restart: always
+    ports:
+      - "3000:3000"

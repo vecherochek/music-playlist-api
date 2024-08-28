@@ -4,7 +4,10 @@ import (
 	"context"
 	"log"
 	"net"
+	"net/http"
 
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/vecherochek/music-playlist-api/internal/config"
 	desc "github.com/vecherochek/music-playlist-api/pkg/player_v1"
 	"google.golang.org/grpc"
@@ -68,12 +71,25 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(_ context.Context) error {
-	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
+		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor))
 
 	reflection.Register(a.grpcServer)
 	desc.RegisterPlayerV1Server(a.grpcServer, a.serviceProvider.PlayerImpl())
 	desc.RegisterPlaylistV1Server(a.grpcServer, a.serviceProvider.PlaylistImpl())
 	desc.RegisterSongV1Server(a.grpcServer, a.serviceProvider.SongImpl())
+
+	grpc_prometheus.Register(a.grpcServer)
+	http.Handle("/metrics", promhttp.Handler())
+
+	go func() {
+		err := http.ListenAndServe("localhost:8082", nil)
+		if err != nil {
+			return
+		}
+	}()
 
 	return nil
 }
