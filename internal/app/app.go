@@ -70,20 +70,6 @@ func (a *App) initServiceProvider(_ context.Context) error {
 	return nil
 }
 
-func (a *App) initPrometheus(_ context.Context) error {
-	grpc_prometheus.Register(a.grpcServer)
-	http.Handle("/metrics", promhttp.Handler())
-
-	go func() {
-		err := http.ListenAndServe("localhost:8082", nil)
-		if err != nil {
-			return
-		}
-	}()
-
-	return nil
-}
-
 func (a *App) initGRPCServer(_ context.Context) error {
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
@@ -94,6 +80,16 @@ func (a *App) initGRPCServer(_ context.Context) error {
 	desc.RegisterPlayerV1Server(a.grpcServer, a.serviceProvider.PlayerImpl())
 	desc.RegisterPlaylistV1Server(a.grpcServer, a.serviceProvider.PlaylistImpl())
 	desc.RegisterSongV1Server(a.grpcServer, a.serviceProvider.SongImpl())
+
+	grpc_prometheus.Register(a.grpcServer)
+	http.Handle("/metrics", promhttp.Handler())
+
+	go func() {
+		err := http.ListenAndServe("localhost:8082", nil)
+		if err != nil {
+			return
+		}
+	}()
 
 	return nil
 }
